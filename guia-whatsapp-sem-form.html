@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia: Como automatizar o atendimento no WhatsApp Business · Salvy</title>
+<meta name="description" content="Passo a passo para configurar o Meta Business Agent no WhatsApp Business da sua empresa, quando evoluir para a API oficial e mais.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1A1A1A;
+    --ink-2: #3d3d3d;
+    --muted: #6B6B6B;
+    --muted-2: #9A9A9A;
+    --white: #FFFFFF;
+    --gray-1: #FAFAFA;
+    --gray-2: #F1F1F1;
+    --gray-3: #E6E6E6;
+    --wa: #25D366;
+    --wa-dark: #1DA851;
+    --wa-deep: #15803D;
+    --wa-muted: rgba(37,211,102,0.10);
+    --radius-xl: 32px;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --sh-card: 0 6px 8px 0 rgba(0,0,0,0.05);
+    --sh-card-hov: 0 16px 32px -8px rgba(0,0,0,0.12);
+    --sh-cta: 0 4px 8px rgba(0,0,0,0.15);
+    --grad-dark: linear-gradient(135deg, #1A1A1A 0%, #6D6D6D 161%);
+    --f-display: 'Poppins', sans-serif;
+    --f-body: 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--f-body);
+    color: var(--ink);
+    background: var(--white);
+    -webkit-font-smoothing: antialiased;
+    font-size: 15px; line-height: 1.6;
+    letter-spacing: -0.01em;
+    overflow-x: hidden;
+  }
+
+  .logo-svg { display: block; }
+  .logo-svg path { fill: currentColor; }
+  .wa-badge { width: 20px; height: 20px; flex-shrink: 0; display: inline-block; }
+
+  /* ── LOGO / BOTÃO PRIMÁRIO ── */
+  .nav-logo { color: var(--ink); display: flex; align-items: center; }
+  .nav-logo .logo-svg { height: 26px; width: auto; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--grad-dark); color: var(--white);
+    font-family: var(--f-body); font-size: 14px; font-weight: 500;
+    padding: 7px 22px 7px 7px; border-radius: 999px; border: none; cursor: pointer;
+    text-decoration: none; box-shadow: var(--sh-cta);
+    transition: transform 0.2s, box-shadow 0.2s; letter-spacing: -0.01em;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 18px -2px rgba(0,0,0,0.24); }
+  .btn-primary .arrow-circle {
+    width: 32px; height: 32px; border-radius: 50%; background: #9a9a9a;
+    display: grid; place-items: center; flex-shrink: 0; transition: transform 0.2s, background 0.2s;
+  }
+  .btn-primary:hover .arrow-circle { background: #b0b0b0; transform: translateX(2px); }
+  .btn-primary .arrow-circle svg { width: 14px; height: 14px; }
+
+  /* ── HERO ── */
+  .hero { position: relative; background: var(--gray-1); padding: 40px 48px 72px; overflow: hidden; }
+  @media (max-width: 768px) { .hero { padding: 28px 20px 48px; } }
+  .hero-glow {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(37,211,102,0.06) 0%, transparent 70%);
+  }
+  .hero-inner {
+    max-width: 860px; margin: 0 auto; position: relative; z-index: 2;
+    display: flex; flex-direction: column; align-items: center; gap: 28px; text-align: center;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 9px; background: var(--white);
+    border: 1px solid var(--gray-3); padding: 7px 16px 7px 8px; border-radius: 999px;
+    font-size: 13px; font-weight: 500; color: var(--ink-2); letter-spacing: -0.01em;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  }
+  .hero-tag .wa-badge {
+    width: 22px; height: 22px; flex-shrink: 0;
+  }
+  .hero-title {
+    font-family: var(--f-display); font-size: clamp(34px, 5.2vw, 56px); font-weight: 500;
+    color: var(--ink-2); line-height: 1.1; letter-spacing: -0.035em; max-width: 760px;
+  }
+  .hero-title .accent { color: var(--wa-deep); }
+  .hero-desc { font-size: 17px; color: var(--muted); line-height: 1.6; max-width: 560px; letter-spacing: -0.01em; }
+  .hero-cta-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+  .hero-cta-note { font-size: 13px; color: var(--muted-2); }
+
+  .hero-visual {
+    margin-top: 24px; width: 100%; max-width: 760px; position: relative;
+  }
+
+  /* painel horizontal — tela de configuração do Meta Business Agent */
+  .config-panel {
+    background: var(--white); border: 1px solid var(--gray-3); border-radius: var(--radius-lg);
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.16), 0 8px 20px -8px rgba(0,0,0,0.06);
+    overflow: hidden; text-align: left;
+  }
+  .cp-bar {
+    display: flex; align-items: center; gap: 10px; padding: 14px 20px;
+    border-bottom: 1px solid var(--gray-2); background: var(--gray-1);
+  }
+  .cp-bar-ic {
+    width: 26px; height: 26px; border-radius: 8px; background: var(--wa-muted);
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .cp-bar-ic .wa-badge { width: 18px; height: 18px; }
+  .cp-bar span { font-family: var(--f-display); font-size: 14px; font-weight: 600; color: var(--ink-2); letter-spacing: -0.02em; }
+  .cp-bar-tag {
+    margin-left: auto; font-size: 11px; font-weight: 500; color: var(--wa-deep); background: var(--wa-muted);
+    padding: 4px 10px; border-radius: 999px; letter-spacing: -0.01em;
+  }
+
+  .cp-body { padding: 26px 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  @media (max-width: 600px) { .cp-body { grid-template-columns: 1fr; gap: 20px; padding: 22px 20px; } }
+
+  .cp-col { display: flex; flex-direction: column; gap: 16px; }
+  .pm-field-label { font-size: 10.5px; font-weight: 600; color: var(--muted-2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .pm-field-value {
+    background: var(--gray-1); border: 1px solid var(--gray-2); border-radius: var(--radius-sm);
+    padding: 10px 13px; font-size: 13.5px; color: var(--ink-2); letter-spacing: -0.01em;
+  }
+  .pm-field-value.placeholder { color: var(--muted-2); }
+
+  .pm-toggle-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 11px 0; border-top: 1px solid var(--gray-2);
+  }
+  .pm-toggle-row:first-child { border-top: none; padding-top: 0; }
+  .pm-toggle-label { font-size: 13.5px; color: var(--ink-2); letter-spacing: -0.01em; font-weight: 500; }
+  .pm-toggle-sub { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+  .pm-toggle { width: 34px; height: 20px; border-radius: 999px; background: var(--gray-3); position: relative; flex-shrink: 0; }
+  .pm-toggle.on { background: var(--wa); }
+  .pm-toggle::after {
+    content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+    border-radius: 50%; background: var(--white); box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+  }
+  .pm-toggle.on::after { transform: translateX(14px); }
+
+  .cp-footer {
+    display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+    padding: 16px 28px; border-top: 1px solid var(--gray-2); background: var(--gray-1);
+  }
+  @media (max-width: 600px) { .cp-footer { padding: 14px 20px; } }
+  .pm-save-status {
+    display: inline-flex; align-items: center; gap: 7px;
+    color: var(--muted); font-size: 12.5px; letter-spacing: -0.01em;
+  }
+  .pm-save-status svg { width: 14px; height: 14px; color: var(--wa-deep); flex-shrink: 0; }
+
+  /* bubble de exemplo (usado no card "Sua IA" da seção Meta Business Agent) */
+  .bubble { max-width: 78%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; box-shadow: 0 1px 1px rgba(0,0,0,0.06); }
+  .bubble.in { align-self: flex-start; background: var(--white); color: var(--ink); border-top-left-radius: 4px; }
+  .bubble.out { align-self: flex-end; background: #d9fdd3; color: var(--ink); border-top-right-radius: 4px; }
+  .bubble .who { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--wa-deep); margin-bottom: 3px; }
+  .bubble .who .wa-badge { width: 12px; height: 12px; }
+  .bubble .time { font-size: 10px; color: var(--muted-2); display: block; text-align: right; margin-top: 3px; }
+
+  /* trust strip */
+  .trust-strip { padding: 40px 48px; background: var(--white); border-bottom: 1px solid var(--gray-2); }
+  @media (max-width: 768px) { .trust-strip { padding: 32px 20px; } }
+  .trust-inner { max-width: 1000px; margin: 0 auto; text-align: center; }
+  .trust-label { font-size: 12px; color: var(--muted-2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 20px; }
+  .trust-logos { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; }
+  .trust-logos .tl { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 500; color: var(--ink-2); letter-spacing: -0.01em; }
+  .trust-logos .tl svg, .trust-logos .tl .wa-badge { width: 24px; height: 24px; flex-shrink: 0; }
+  .trust-sep { width: 1px; height: 24px; background: var(--gray-3); }
+  @media (max-width: 600px) { .trust-sep { display: none; } }
+
+  /* ── SECTIONS ── */
+  .section { padding: 88px 48px; }
+  .section.alt { background: var(--gray-1); }
+  .section.dark { background: var(--ink); }
+  @media (max-width: 768px) { .section { padding: 60px 20px; } }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  .wrap-narrow { max-width: 720px; margin: 0 auto; }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 7px; background: var(--white);
+    border: 1px solid var(--gray-3); color: var(--ink-2); font-size: 12.5px; font-weight: 500;
+    padding: 6px 15px; border-radius: 999px; letter-spacing: -0.01em; margin-bottom: 18px;
+  }
+  .section.alt .eyebrow { background: var(--white); }
+  .eyebrow.wa { background: var(--wa-muted); border-color: rgba(37,211,102,0.22); color: var(--wa-deep); }
+  .eyebrow .wa-badge { width: 15px; height: 15px; }
+  .eyebrow .hand { width: 13px; height: 16px; }
+  .eyebrow .hand path { fill: currentColor; }
+
+  .h2 { font-family: var(--f-display); font-size: clamp(26px, 3.6vw, 38px); font-weight: 500; color: var(--ink-2); line-height: 1.18; letter-spacing: -0.035em; }
+  .h2.white { color: var(--white); }
+  .h2.center { text-align: center; }
+  .lead { font-size: 17px; color: var(--muted); line-height: 1.65; letter-spacing: -0.01em; margin-top: 14px; }
+  .lead.white { color: rgba(255,255,255,0.55); }
+  .lead.center { text-align: center; margin-left: auto; margin-right: auto; max-width: 580px; }
+  .section-head { margin-bottom: 52px; }
+  .section-head.center { text-align: center; }
+
+  p.body { font-size: 16px; color: var(--muted); line-height: 1.75; margin-bottom: 18px; letter-spacing: -0.01em; }
+  p.body strong { color: var(--ink-2); font-weight: 600; }
+  p.body.center { text-align: center; margin-bottom: 0; }
+
+  /* intro pills */
+  .intro-pills { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .intro-pill {
+    display: flex; align-items: center; gap: 14px; background: var(--gray-1);
+    border: 1px solid var(--gray-3); border-radius: var(--radius-md);
+    padding: 15px 20px; font-size: 14.5px; color: var(--ink-2); letter-spacing: -0.01em;
+  }
+  .intro-pill .ip-num {
+    font-family: var(--f-display); font-weight: 600; font-size: 13px; color: var(--wa-deep);
+    background: var(--wa-muted); border-radius: 999px; width: 30px; height: 30px;
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+
+  /* stat band */
+  .stat-band { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; text-align: center; max-width: 640px; margin: 0 auto; }
+  @media (max-width: 640px) { .stat-band { grid-template-columns: 1fr; gap: 32px; } }
+  .stat-num { font-family: var(--f-display); font-size: 48px; font-weight: 700; color: var(--ink-2); line-height: 1; letter-spacing: -0.04em; margin-bottom: 8px; }
+  .stat-num .accent { color: var(--wa-deep); }
+  .stat-cap { font-size: 14px; color: var(--muted); line-height: 1.5; max-width: 240px; margin: 0 auto; }
+  .stat-source { font-size: 12px; color: var(--muted-2); }
+
+  /* feature rows (alternating) */
+  .feature-row { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; margin-bottom: 40px; }
+  .feature-row:last-child { margin-bottom: 0; }
+  .feature-row.flip .fr-visual { order: -1; }
+  @media (max-width: 820px) { .feature-row { grid-template-columns: 1fr; gap: 28px; } .feature-row.flip .fr-visual { order: 0; } }
+  .fr-kicker { font-size: 13px; font-weight: 600; color: var(--wa-deep); letter-spacing: -0.01em; margin-bottom: 10px; }
+  .fr-title { font-family: var(--f-display); font-size: 24px; font-weight: 500; color: var(--ink-2); letter-spacing: -0.03em; line-height: 1.25; margin-bottom: 12px; }
+  .fr-text { font-size: 15px; color: var(--muted); line-height: 1.7; letter-spacing: -0.01em; }
+  .fr-list { list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 9px; }
+  .fr-list li { display: flex; align-items: flex-start; gap: 9px; font-size: 14.5px; color: var(--ink-2); letter-spacing: -0.01em; }
+  .fr-list li svg { width: 15px; height: 15px; color: var(--wa-deep); flex-shrink: 0; margin-top: 3px; }
+  .fr-visual {
+    background: var(--white); border: 1px solid var(--gray-3); border-radius: var(--radius-lg);
+    padding: 32px; box-shadow: var(--sh-card); min-height: 220px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .section.alt .fr-visual { background: var(--white); }
+
+  /* salvy panel mockup (for the "onde a Salvy entra" block) */
+  .panel-mock { width: 100%; background: var(--white); border: 1px solid var(--gray-3); border-radius: var(--radius-lg); padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+  .panel-mock .pm-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid var(--gray-2); }
+  .panel-mock .pm-title { font-family: var(--f-display); font-size: 13px; font-weight: 600; color: var(--ink-2); letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; }
+  .panel-mock .pm-title .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink); }
+  .panel-mock .pm-badge { font-size: 10.5px; font-weight: 500; color: var(--muted); background: var(--gray-1); padding: 3px 9px; border-radius: 999px; }
+  .panel-mock .pm-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 13px; background: var(--gray-1); border: 1px solid var(--gray-2); border-radius: 10px; }
+  .panel-mock .pm-row .pm-line { display: flex; align-items: center; gap: 10px; }
+  .panel-mock .pm-row .pm-ic { width: 26px; height: 26px; border-radius: 7px; background: var(--white); border: 1px solid var(--gray-3); display: grid; place-items: center; flex-shrink: 0; }
+  .panel-mock .pm-row .pm-ic svg { width: 13px; height: 13px; color: var(--ink-2); }
+  .panel-mock .pm-row .pm-num { font-family: var(--f-body); font-size: 12.5px; font-weight: 500; color: var(--ink-2); letter-spacing: -0.01em; }
+  .panel-mock .pm-row .pm-sub { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
+  .panel-mock .pm-row .pm-status { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 999px; color: var(--wa-deep); background: var(--wa-muted); letter-spacing: -0.01em; }
+
+  /* fluxograma de decisão (planos Salvy) */
+  .flow-diagram { width: 100%; margin: 28px 0; }
+  .flow-diagram svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .flow-diagram .flow-node { opacity: 0; transform: translateY(14px) scale(0.97); transform-box: fill-box; transform-origin: center; transition: opacity 0.55s ease, transform 0.55s cubic-bezier(.34,1.56,.64,1); }
+  .flow-diagram.in .flow-node { opacity: 1; transform: none; }
+  .flow-diagram .flow-line { fill: none; stroke: var(--muted-2); stroke-width: 2; stroke-linejoin: round; stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset 0.8s cubic-bezier(.22,.61,.36,1); }
+  .flow-diagram.in .flow-line { stroke-dashoffset: 0; }
+  .flow-diagram .flow-tag-bg { opacity: 0; transition: opacity 0.4s ease; }
+  .flow-diagram.in .flow-tag-bg { opacity: 1; }
+  .flow-diagram .flow-tag-text { font-family: var(--f-body); font-size: 12px; font-weight: 500; fill: var(--ink-2); letter-spacing: -0.01em; opacity: 0; transition: opacity 0.4s ease; }
+  .flow-diagram.in .flow-tag-text { opacity: 1; }
+  .flow-diagram .flow-title { font-family: var(--f-display); font-size: 15px; font-weight: 500; fill: var(--ink-2); letter-spacing: -0.02em; }
+  .flow-diagram .flow-sub { font-family: var(--f-body); font-size: 12px; fill: var(--muted); letter-spacing: -0.01em; }
+  .flow-diagram .flow-eyebrow { font-family: var(--f-body); font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; fill: var(--muted-2); }
+  .flow-diagram .flow-eyebrow.result { fill: var(--wa-deep); }
+  .flow-diagram .flow-decision { fill: var(--white); stroke: var(--gray-3); stroke-width: 1.5; }
+  .flow-diagram .flow-result { fill: var(--wa-muted); stroke: var(--wa-deep); stroke-width: 1.5; }
+  @media (max-width: 640px) { .flow-diagram .flow-title { font-size: 13px; } .flow-diagram .flow-sub, .flow-diagram .flow-tag-text, .flow-diagram .flow-eyebrow { font-size: 10.5px; } }
+
+  /* steps as timeline */
+  .steps { position: relative; margin-top: 8px; }
+  .step { display: flex; gap: 20px; padding-bottom: 32px; position: relative; }
+  .step:last-child { padding-bottom: 0; }
+  .step::before {
+    content: ''; position: absolute; left: 21px; top: 44px; bottom: -4px; width: 2px; background: var(--gray-3);
+  }
+  .step:last-child::before { display: none; }
+  .step-num {
+    width: 44px; height: 44px; border-radius: 50%; background: var(--white); border: 2px solid var(--ink);
+    color: var(--ink); font-family: var(--f-display); font-size: 16px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; z-index: 2;
+  }
+  .step-body { padding-top: 7px; }
+  .step-body h3 { font-family: var(--f-display); font-size: 17px; font-weight: 600; color: var(--ink-2); margin-bottom: 6px; letter-spacing: -0.02em; }
+  .step-body p { font-size: 14.5px; color: var(--muted); line-height: 1.65; letter-spacing: -0.01em; }
+  .step-tip { display: inline-flex; align-items: center; gap: 6px; background: var(--wa-muted); color: var(--wa-deep); font-size: 12px; font-weight: 500; padding: 4px 11px; border-radius: 999px; margin-top: 10px; }
+  .step-tip svg { width: 12px; height: 12px; }
+
+  /* callout */
+  .callout { border-left: 3px solid var(--wa); background: var(--wa-muted); padding: 18px 22px; border-radius: 0 12px 12px 0; margin: 24px 0; font-size: 15px; color: var(--ink-2); line-height: 1.65; letter-spacing: -0.01em; }
+  .callout.warn { border-left-color: #F0A020; background: #FDF6E8; }
+
+  /* mid-content Salvy banner */
+  .salvy-banner {
+    display: flex; align-items: center; gap: 24px; justify-content: space-between;
+    background: var(--white); border: 1px solid var(--gray-3); border-radius: var(--radius-lg);
+    padding: 28px 32px; margin: 44px 0; box-shadow: var(--sh-card); flex-wrap: wrap;
+  }
+  .section.alt .salvy-banner { background: var(--white); }
+  .sb-copy { display: flex; align-items: center; gap: 18px; flex: 1; min-width: 240px; }
+  .sb-mark { width: 34px; height: auto; color: var(--ink); flex-shrink: 0; }
+  .sb-mark path { fill: currentColor; }
+  .sb-text h4 { font-family: var(--f-display); font-size: 16px; font-weight: 600; color: var(--ink-2); letter-spacing: -0.02em; margin-bottom: 3px; }
+  .sb-text p { font-size: 13.5px; color: var(--muted); letter-spacing: -0.01em; line-height: 1.5; }
+  .sb-btn {
+    display: inline-flex; align-items: center; gap: 9px; background: var(--grad-dark); color: var(--white);
+    font-family: var(--f-body); font-size: 13.5px; font-weight: 500; padding: 6px 6px 6px 18px;
+    border-radius: 999px; text-decoration: none; box-shadow: var(--sh-cta); flex-shrink: 0;
+    transition: transform 0.2s, box-shadow 0.2s; letter-spacing: -0.01em; white-space: nowrap;
+  }
+  .sb-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 18px -2px rgba(0,0,0,0.24); }
+  .sb-btn .arrow-circle { width: 26px; height: 26px; border-radius: 50%; background: #9a9a9a; display: grid; place-items: center; flex-shrink: 0; transition: transform 0.2s, background 0.2s; }
+  .sb-btn:hover .arrow-circle { background: #b0b0b0; transform: translateX(2px); }
+  .sb-btn .arrow-circle svg { width: 11px; height: 11px; }
+  @media (max-width: 600px) { .salvy-banner { padding: 22px 20px; } .sb-btn { width: 100%; justify-content: center; } }
+
+  /* two-col cards */
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+  @media (max-width: 640px) { .duo { grid-template-columns: 1fr; } }
+  .duo-card { background: var(--white); border: 1px solid var(--gray-3); border-radius: var(--radius-md); padding: 24px; box-shadow: var(--sh-card); transition: box-shadow 0.3s ease, transform 0.3s ease; }
+  .duo-card:hover { box-shadow: var(--sh-card-hov); transform: translateY(-2px); }
+  .duo-card h4 { font-family: var(--f-display); font-size: 15px; font-weight: 600; color: var(--ink-2); margin-bottom: 14px; letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; }
+  .duo-card h4 .ic { width: 20px; height: 20px; border-radius: 6px; display: grid; place-items: center; flex-shrink: 0; }
+  .duo-card h4 .ic svg { width: 13px; height: 13px; }
+  .duo-card.pos h4 .ic { background: var(--wa-muted); color: var(--wa-deep); }
+  .duo-card.neg h4 .ic { background: var(--gray-2); color: var(--muted); }
+  .duo-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .duo-card ul li { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; color: var(--muted); line-height: 1.55; letter-spacing: -0.01em; }
+  .duo-card ul li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--gray-3); flex-shrink: 0; margin-top: 8px; }
+  .duo-card.pos ul li::before { background: var(--wa); }
+
+  /* template */
+  .template { background: var(--gray-1); border: 1.5px dashed var(--gray-3); border-radius: var(--radius-md); padding: 26px; margin: 16px 0; }
+  .section.alt .template { background: var(--white); }
+  .template-label { font-family: var(--f-display); font-size: 12px; font-weight: 600; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .template-label::before { content: ''; width: 8px; height: 8px; border-radius: 2px; background: var(--wa); }
+  .trow { display: flex; margin-bottom: 6px; border-radius: 8px; overflow: hidden; }
+  @media (max-width: 520px) { .trow { flex-direction: column; } }
+  .tq { font-size: 13px; font-weight: 500; color: var(--ink-2); padding: 11px 14px; background: var(--gray-2); flex: 1.1; display: flex; align-items: center; line-height: 1.4; }
+  .ta { font-size: 12.5px; color: var(--muted-2); padding: 11px 14px; background: var(--white); flex: 1.6; font-style: italic; border: 1px solid var(--gray-3); border-left: none; display: flex; align-items: center; line-height: 1.4; }
+  @media (max-width: 520px) { .ta { border-left: 1px solid var(--gray-3); border-top: none; } }
+
+  /* evolution */
+  .evo { display: flex; flex-direction: column; gap: 10px; margin: 28px 0; }
+  .evo-card { background: var(--white); border: 1px solid var(--gray-3); border-radius: var(--radius-md); padding: 22px 26px; box-shadow: var(--sh-card); display: flex; align-items: center; gap: 20px; transition: box-shadow 0.2s, transform 0.2s; }
+  .evo-card:hover { box-shadow: var(--sh-card-hov); transform: translateY(-2px); }
+  .evo-card.active { background: var(--wa-muted); border-color: var(--wa-deep); }
+  .evo-badge { width: 40px; height: 40px; border-radius: 12px; background: var(--gray-1); color: var(--ink); font-family: var(--f-display); font-weight: 600; font-size: 15px; display: grid; place-items: center; flex-shrink: 0; }
+  .evo-card.active .evo-badge { background: var(--wa-deep); color: var(--white); }
+  .evo-card h4 { font-family: var(--f-display); font-size: 16px; font-weight: 600; color: var(--ink-2); letter-spacing: -0.02em; margin-bottom: 3px; }
+  .evo-card.active h4 { color: var(--ink-2); }
+  .evo-card p { font-size: 13.5px; color: var(--muted); line-height: 1.55; letter-spacing: -0.01em; }
+  .evo-card.active p { color: var(--muted); }
+  .evo-tag { margin-left: auto; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--wa-muted); color: var(--wa-deep); white-space: nowrap; flex-shrink: 0; }
+  @media (max-width: 640px) { .evo-tag { display: none; } }
+
+  /* comparison */
+  .compare { border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--gray-3); margin: 24px 0; box-shadow: var(--sh-card); }
+  .crow { display: grid; grid-template-columns: 2fr 1fr 1fr; }
+  .crow.head { background: var(--ink); color: var(--white); font-family: var(--f-display); font-size: 13px; font-weight: 600; }
+  .crow.head div { padding: 14px 18px; }
+  .crow:not(.head) { border-top: 1px solid var(--gray-3); font-size: 14px; background: var(--white); }
+  .crow:not(.head) div { padding: 14px 18px; }
+  .crow:not(.head) div:first-child { color: var(--ink-2); font-weight: 500; }
+  .crow:not(.head) div:not(:first-child) { text-align: center; color: var(--muted); }
+  .crow .ok { color: var(--wa-deep); font-weight: 600; }
+
+  /* faq */
+  .faq { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .faq-item { background: var(--gray-1); border: 1px solid var(--gray-2); border-radius: var(--radius-md); overflow: hidden; transition: box-shadow 0.2s; }
+  .section.alt .faq-item { background: var(--white); }
+  .faq-item[open] { box-shadow: var(--sh-card); }
+  .faq-item summary { list-style: none; cursor: pointer; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; font-family: var(--f-display); font-size: 16px; font-weight: 500; color: var(--ink-2); letter-spacing: -0.02em; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary .chev { width: 20px; height: 20px; flex-shrink: 0; color: var(--muted); transition: transform 0.25s; }
+  .faq-item[open] summary .chev { transform: rotate(180deg); }
+  .faq-item .faq-a { padding: 0 24px 22px; font-size: 14.5px; color: var(--muted); line-height: 1.7; letter-spacing: -0.01em; }
+
+  /* ── GATE ── */
+  #gate { background: var(--gray-1); padding: 80px 48px; }
+  @media (max-width: 768px) { #gate { padding: 56px 20px; } }
+  .gate-grid { max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: 1fr 620px; gap: 48px; align-items: center; }
+  @media (max-width: 1100px) { .gate-grid { grid-template-columns: 1fr; gap: 32px; max-width: 620px; } }
+  .gate-copy .hand-mark { width: 48px; height: auto; color: var(--ink); margin-bottom: 20px; }
+  .gate-copy .hand-mark path { fill: currentColor; }
+  .gate-copy h2 { font-family: var(--f-display); font-size: 30px; font-weight: 500; color: var(--ink-2); letter-spacing: -0.035em; line-height: 1.2; margin-bottom: 14px; }
+  .gate-copy p { font-size: 16px; color: var(--muted); line-height: 1.65; letter-spacing: -0.01em; }
+  .gate-copy .gate-bullets { list-style: none; margin-top: 22px; display: flex; flex-direction: column; gap: 11px; }
+  .gate-copy .gate-bullets li { display: flex; align-items: center; gap: 10px; font-size: 14.5px; color: var(--ink-2); letter-spacing: -0.01em; }
+  .gate-copy .gate-bullets li svg { width: 16px; height: 16px; color: var(--wa-deep); flex-shrink: 0; }
+
+  .gate-card { background: var(--white); border: 1px solid var(--gray-3); border-radius: var(--radius-lg); padding: 40px; box-shadow: var(--sh-card); }
+  @media (max-width: 768px) { .gate-card { padding: 28px 24px; } }
+  .gate-eyebrow { display: inline-flex; align-items: center; gap: 6px; background: var(--gray-2); color: var(--ink-2); font-size: 11px; font-weight: 500; padding: 5px 12px; border-radius: 999px; letter-spacing: 0.03em; text-transform: uppercase; margin-bottom: 16px; }
+  .gate-eyebrow svg { width: 12px; height: 12px; }
+  .gate-title { font-family: var(--f-display); font-size: 20px; font-weight: 500; color: var(--ink-2); line-height: 1.3; letter-spacing: -0.03em; margin-bottom: 22px; }
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 13px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 480px) { .field-row { grid-template-columns: 1fr; } }
+  .field label { font-size: 12.5px; font-weight: 500; color: var(--ink-2); letter-spacing: -0.01em; }
+  .field input, .field select { padding: 12px 14px; border: 1px solid var(--gray-3); border-radius: var(--radius-sm); font-family: var(--f-body); font-size: 14px; color: var(--ink); background: var(--white); outline: none; transition: border-color 0.15s, box-shadow 0.15s; letter-spacing: -0.01em; appearance: auto; }
+  .field input:focus, .field select:focus { border-color: var(--wa); box-shadow: 0 0 0 3px rgba(37,211,102,0.1); }
+  .field select:invalid { color: var(--muted-2); }
+  .phone-group { display: flex; gap: 8px; }
+  .phone-group .ddd-input { width: 56px; text-align: center; flex-shrink: 0; }
+  .phone-group .number-input { flex: 1; min-width: 0; }
+  .field-error { display: none; font-size: 12px; color: #B42318; margin-top: 2px; letter-spacing: -0.01em; }
+  .field.has-error input { border-color: #B42318; }
+  .field.has-error .field-error { display: block; }
+
+  /* ── CUSTOM SELECT (tamanho da empresa) ── */
+  .custom-select { position: relative; }
+  .custom-select-btn {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 12px 14px; border: 1px solid var(--gray-3); border-radius: var(--radius-sm);
+    font-family: var(--f-body); font-size: 14px; color: var(--ink); background: var(--white);
+    outline: none; cursor: pointer; text-align: left; transition: border-color 0.15s, box-shadow 0.15s;
+    letter-spacing: -0.01em;
+  }
+  .custom-select-btn:focus, .custom-select-btn.open { border-color: var(--wa); box-shadow: 0 0 0 3px rgba(37,211,102,0.1); }
+  .custom-select-label.placeholder { color: var(--muted-2); }
+  .custom-select-chevron { width: 16px; height: 16px; flex-shrink: 0; color: var(--muted); transition: transform 0.15s; }
+  .custom-select-btn.open .custom-select-chevron { transform: rotate(180deg); }
+  .field.has-error .custom-select-btn { border-color: #B42318; }
+  .custom-select-list {
+    list-style: none; position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 30;
+    background: var(--white); border: 1px solid var(--gray-3); border-radius: var(--radius-sm);
+    box-shadow: var(--sh-card-hov); max-height: 220px; overflow-y: auto; display: none; padding: 6px;
+  }
+  .custom-select-list.open { display: block; }
+  .custom-select-list li {
+    padding: 9px 10px; font-size: 14px; color: var(--ink); border-radius: 8px; cursor: pointer;
+    letter-spacing: -0.01em;
+  }
+  .custom-select-list li:hover, .custom-select-list li.highlighted { background: var(--gray-2); }
+  .custom-select-list li.selected { color: var(--wa-deep); font-weight: 500; }
+  .gate-submit { width: 100%; margin-top: 8px; background: var(--grad-dark); color: var(--white); font-family: var(--f-body); font-size: 15px; font-weight: 500; padding: 14px; border: none; border-radius: 999px; cursor: pointer; box-shadow: var(--sh-cta); transition: transform 0.2s; letter-spacing: -0.01em; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .gate-submit:hover { transform: translateY(-1px); }
+  .gate-privacy { font-size: 11.5px; color: var(--muted-2); text-align: center; margin-top: 14px; letter-spacing: -0.01em; }
+
+  .gate-success { display: none; text-align: center; padding: 12px 0; }
+  .gate-success.show { display: block; }
+  .success-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--wa-muted); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .success-icon svg { width: 26px; height: 26px; color: var(--wa-deep); }
+  .gate-success h3 { font-family: var(--f-display); font-size: 20px; font-weight: 500; color: var(--ink-2); letter-spacing: -0.03em; margin-bottom: 8px; }
+  .gate-success p { font-size: 14.5px; color: var(--muted); margin-bottom: 22px; }
+  .scroll-cta { display: inline-flex; align-items: center; gap: 10px; background: var(--grad-dark); color: var(--white); text-decoration: none; font-size: 14px; font-weight: 500; padding: 10px 22px 10px 10px; border-radius: 999px; box-shadow: var(--sh-cta); transition: transform 0.2s; letter-spacing: -0.01em; }
+  .scroll-cta:hover { transform: translateY(-1px); }
+  .scroll-cta .arrow-circle { width: 30px; height: 30px; border-radius: 50%; background: #9a9a9a; display: grid; place-items: center; }
+  .scroll-cta .arrow-circle svg { width: 13px; height: 13px; }
+
+  /* locked content */
+  #content { position: relative; }
+
+  .lock-msg { text-align: center; padding: 0 24px; }
+  .lock-msg .lock-hand { width: 40px; height: auto; color: var(--muted); margin-bottom: 14px; opacity: 0.5; }
+  .lock-msg .lock-hand path { fill: currentColor; }
+  .lock-msg h3 { font-family: var(--f-display); font-size: 17px; font-weight: 500; color: var(--ink-2); letter-spacing: -0.02em; margin-bottom: 4px; }
+  .lock-msg p { font-size: 14px; color: var(--muted); }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .content-unlocked { animation: fadeUp 0.5s ease forwards; }
+
+  /* ── SCROLL REVEAL / MOTION ── */
+  .reveal { opacity: 0; transform: translateY(28px); filter: blur(4px); transition: opacity 0.8s cubic-bezier(.22,.61,.36,1), transform 0.8s cubic-bezier(.22,.61,.36,1), filter 0.8s cubic-bezier(.22,.61,.36,1); }
+  .reveal.in { opacity: 1; transform: translateY(0); filter: blur(0); }
+  .reveal-group .reveal-item { opacity: 0; transform: translateY(20px); filter: blur(3px); transition: opacity 0.6s cubic-bezier(.22,.61,.36,1), transform 0.6s cubic-bezier(.22,.61,.36,1), filter 0.6s cubic-bezier(.22,.61,.36,1); }
+  .reveal-group.in .reveal-item { opacity: 1; transform: translateY(0); filter: blur(0); }
+  .reveal-group.in .reveal-item:nth-child(1) { transition-delay: 0.02s; }
+  .reveal-group.in .reveal-item:nth-child(2) { transition-delay: 0.08s; }
+  .reveal-group.in .reveal-item:nth-child(3) { transition-delay: 0.14s; }
+  .reveal-group.in .reveal-item:nth-child(4) { transition-delay: 0.20s; }
+  .reveal-group.in .reveal-item:nth-child(5) { transition-delay: 0.26s; }
+  .reveal-group.in .reveal-item:nth-child(6) { transition-delay: 0.32s; }
+  .reveal-group.in .reveal-item:nth-child(7) { transition-delay: 0.38s; }
+  .step.reveal-item { transform: translateY(24px); }
+  .step.reveal-item .step-num { transition: background 0.4s, border-color 0.4s, transform 0.5s cubic-bezier(.34,1.56,.64,1); transform: scale(0.7); }
+  .reveal-group.in .step.reveal-item .step-num { transform: scale(1); }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .reveal-group .reveal-item { opacity: 1 !important; transform: none !important; transition: none !important; }
+  }
+  .hero-inner > * { animation: fadeUp 0.7s cubic-bezier(.16,.8,.24,1) backwards; }
+  .hero-inner > *:nth-child(1) { animation-delay: 0.02s; }
+  .hero-inner > *:nth-child(2) { animation-delay: 0.10s; }
+  .hero-inner > *:nth-child(3) { animation-delay: 0.18s; }
+  .hero-inner > *:nth-child(4) { animation-delay: 0.26s; }
+  .hero-inner > *:nth-child(5) { animation-delay: 0.34s; }
+
+  /* ── FINAL CTA ── */
+  .final-cta { background: var(--gray-1); padding: 88px 48px; position: relative; overflow: hidden; border-top: 1px solid var(--gray-2); }
+  @media (max-width: 768px) { .final-cta { padding: 60px 20px; } }
+  .fc-glow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 55% 60% at 50% 0%, rgba(0,0,0,0.03) 0%, transparent 60%); }
+  .fc-inner { max-width: 680px; margin: 0 auto; position: relative; z-index: 2; text-align: center; }
+  .fc-eyebrow { display: inline-flex; align-items: center; gap: 7px; background: var(--white); border: 1px solid var(--gray-3); color: var(--ink-2); font-size: 12.5px; font-weight: 500; padding: 6px 15px; border-radius: 999px; letter-spacing: -0.01em; margin-bottom: 22px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
+  .fc-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-2); }
+  .fc-title { font-family: var(--f-display); font-size: clamp(28px, 4.2vw, 42px); font-weight: 500; color: var(--ink-2); line-height: 1.15; letter-spacing: -0.035em; margin-bottom: 14px; }
+  .fc-title .accent { color: var(--ink); }
+  .fc-desc { font-size: 15.5px; color: var(--muted); line-height: 1.65; max-width: 460px; margin: 0 auto 40px; letter-spacing: -0.01em; }
+  .fc-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-bottom: 40px; text-align: left; background: var(--gray-3); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--gray-3); }
+  @media (max-width: 700px) { .fc-opts { grid-template-columns: 1fr; } }
+  .fc-opt { background: var(--white); padding: 22px 20px; }
+  .fc-opt .fc-ic { width: 30px; height: 30px; border-radius: 8px; background: var(--gray-2); display: grid; place-items: center; margin-bottom: 14px; }
+  .fc-opt .fc-ic svg { width: 15px; height: 15px; color: var(--ink-2); }
+  .fc-opt h4 { font-family: var(--f-display); font-size: 14.5px; font-weight: 600; color: var(--ink-2); margin-bottom: 5px; letter-spacing: -0.02em; }
+  .fc-opt p { font-size: 12.5px; color: var(--muted); line-height: 1.5; letter-spacing: -0.01em; }
+  .fc-btn { display: inline-flex; align-items: center; gap: 10px; background: var(--grad-dark); color: var(--white); font-family: var(--f-body); font-size: 15px; font-weight: 500; padding: 7px 7px 7px 24px; border-radius: 999px; text-decoration: none; box-shadow: var(--sh-cta); transition: transform 0.2s, box-shadow 0.2s; letter-spacing: -0.01em; }
+  .fc-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -6px rgba(0,0,0,0.3); }
+  .fc-btn .arrow-circle { width: 34px; height: 34px; border-radius: 50%; background: #9a9a9a; display: grid; place-items: center; transition: transform 0.2s, background 0.2s; flex-shrink: 0; }
+  .fc-btn:hover .arrow-circle { transform: translateX(3px); background: #b0b0b0; }
+  .fc-btn .arrow-circle svg { width: 14px; height: 14px; color: var(--white); }
+
+  /* ── HEADER SIMPLES (logo centralizado) ── */
+  .hero-logo { position: relative; z-index: 2; display: flex; justify-content: center; margin-bottom: 40px; }
+  .hero-logo .logo-svg { height: 24px; width: auto; color: var(--ink); }
+  @media (max-width: 768px) { .hero-logo { margin-bottom: 28px; } }
+
+  /* ── FOOTER SIMPLES ── */
+  .site-footer { padding: 32px 48px; background: var(--gray-1); border-top: 1px solid var(--gray-2); }
+  @media (max-width: 768px) { .site-footer { padding: 24px 20px; } }
+  .site-footer-inner {
+    max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .site-footer .logo-svg { height: 20px; width: auto; color: var(--ink-2); }
+  .site-footer-copy { font-size: 12.5px; color: var(--muted-2); letter-spacing: -0.01em; }
+  .site-footer-links { display: flex; gap: 20px; }
+  .site-footer-links a { font-size: 12.5px; color: var(--muted); text-decoration: none; letter-spacing: -0.01em; }
+  .site-footer-links a:hover { color: var(--ink-2); text-decoration: underline; }
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true">
+  <symbol id="salvy-logo-symbol" viewBox="0 0 2543.86 1366.6"><path d="M 1961.867188 1185.984375 C 1942.976562 1198.160156 1926.503906 1190.132812 1920.292969 1186.113281 C 1912.878906 1181.316406 1900.902344 1170.210938 1904.003906 1149.734375 C 1915.285156 1075.207031 1968.964844 1010.765625 2061.972656 958.472656 C 2058.929688 1053.761719 2032.878906 1140.226562 1961.867188 1185.984375 M 2311.46875 793.742188 C 2302.179688 752.445312 2260.167969 727.453125 2219.378906 738.769531 C 2209.742188 741.441406 2200.246094 744.183594 2190.898438 746.992188 C 2188.628906 734.773438 2186.167969 722.398438 2183.503906 709.871094 C 2146.621094 536.457031 2076.949219 371.484375 2059.277344 331.125 C 2056.757812 325.378906 2051.148438 321.695312 2044.875 321.675781 C 2012.886719 321.582031 1916.980469 321.769531 1916.980469 321.769531 C 1911.640625 321.769531 1907.328125 326.117188 1907.300781 331.457031 C 1905.953125 603.65625 1847.921875 726.234375 1806.578125 726.234375 C 1779.246094 726.234375 1740.394531 662.714844 1719.675781 523.257812 C 1708.957031 451.121094 1706.179688 380.621094 1705.875 331.351562 C 1705.839844 326.027344 1701.507812 321.769531 1696.183594 321.769531 L 1557.9375 321.769531 C 1557.9375 376.195312 1560.613281 459.101562 1573.375 544.992188 C 1586.273438 631.824219 1606.75 702.265625 1634.226562 754.355469 C 1686.453125 853.355469 1756.78125 874.140625 1806.578125 874.140625 C 1876.289062 874.140625 1969.269531 836.273438 2018.550781 657.378906 C 2025.890625 684.320312 2032.785156 712.222656 2038.828125 740.636719 C 2042.871094 759.640625 2046.632812 779.332031 2049.90625 799.394531 C 1988.164062 827.644531 1935.808594 860.085938 1893.214844 896.546875 C 1816.617188 962.117188 1771.046875 1039.851562 1757.761719 1127.597656 C 1746.75 1200.367188 1778.238281 1270.371094 1839.945312 1310.296875 C 1871.050781 1330.421875 1905.953125 1340.484375 1940.894531 1340.484375 C 1975.816406 1340.480469 2010.78125 1330.421875 2041.988281 1310.3125 C 2131.605469 1252.5625 2186.050781 1159.664062 2203.804688 1034.199219 C 2209.785156 991.925781 2211.527344 945.796875 2209.046875 896.121094 C 2224.976562 890.980469 2241.5 886.046875 2258.613281 881.320312 C 2296.785156 870.78125 2320.15625 832.378906 2311.46875 793.742188 "/><path d="M 1349.972656 874.308594 C 1329.84375 874.308594 1309.820312 866.136719 1295.253906 850.132812 C 1165.710938 707.800781 1093.394531 524.050781 1091.019531 331.734375 C 1090.953125 326.34375 1095.359375 321.9375 1100.75 321.9375 L 1229.292969 321.9375 C 1234.597656 321.9375 1238.855469 326.210938 1238.9375 331.515625 C 1240.8125 457.445312 1279.632812 578.78125 1349.972656 681.507812 C 1392.398438 619.496094 1423.757812 550.242188 1442 477.542969 C 1453.921875 430.039062 1460.320312 380.960938 1461.050781 331.515625 C 1461.128906 326.207031 1465.390625 321.9375 1470.699219 321.9375 L 1609.03125 321.9375 C 1609.03125 386.746094 1601.097656 451.210938 1585.460938 513.539062 C 1554.21875 638.03125 1491.851562 754.28125 1405.101562 849.730469 C 1402.960938 852.085938 1400.671875 854.300781 1398.25 856.359375 L 1397.820312 856.722656 C 1383.933594 868.515625 1366.917969 874.308594 1349.972656 874.308594 "/><path d="M 2508.871094 758.125 C 2508.871094 798.410156 2476.214844 831.066406 2435.929688 831.066406 C 2395.644531 831.066406 2362.984375 798.410156 2362.984375 758.125 C 2362.984375 717.839844 2395.644531 685.179688 2435.929688 685.179688 C 2476.214844 685.179688 2508.871094 717.839844 2508.871094 758.125 "/><path d="M 992.503906 330.085938 C 992.914062 272.238281 999.089844 214.542969 1010.992188 158.496094 C 1016.453125 132.78125 1023.183594 107.09375 1031.046875 81.925781 C 1033.820312 73.054688 1028.882812 63.609375 1020.070312 60.664062 L 918.300781 26.617188 C 909.246094 23.589844 899.375 28.496094 896.507812 37.601562 C 887.046875 67.648438 878.96875 98.34375 872.441406 129.074219 C 859.070312 192.042969 851.914062 256.753906 850.972656 321.648438 L 850.785156 321.648438 C 850.785156 324.460938 850.839844 327.265625 850.863281 330.074219 C 850.851562 332.113281 850.785156 334.152344 850.785156 336.191406 L 850.921875 336.191406 C 853.792969 537.714844 916.269531 729.890625 1032.285156 893.921875 C 1037.800781 901.71875 1048.703125 903.386719 1056.40625 897.742188 L 1142.929688 834.292969 C 1150.527344 828.722656 1152.140625 818.128906 1146.722656 810.429688 C 1047.328125 669.152344 994.175781 503.609375 992.503906 330.085938 "/><path d="M 239.964844 499.070312 C 199.023438 473.667969 185.285156 444.871094 189.847656 428.871094 C 194.34375 413.089844 221.777344 396.113281 271.382812 396.113281 L 340.382812 396.113281 C 348.980469 396.113281 355.953125 389.140625 355.953125 380.542969 L 355.953125 262.996094 C 355.953125 254.398438 348.980469 247.425781 340.382812 247.425781 L 271.382812 247.425781 C 135.40625 247.425781 66.242188 320.097656 46.855469 388.113281 C 22.414062 473.855469 67.441406 567 161.566406 625.410156 C 202.039062 650.523438 218.433594 680.425781 213.714844 696.976562 C 209.40625 712.09375 181.464844 728.367188 130.296875 728.367188 L 55.859375 728.367188 C 47.261719 728.367188 40.289062 735.339844 40.289062 743.9375 L 40.289062 861.484375 C 40.289062 870.082031 47.261719 877.054688 55.859375 877.054688 L 130.296875 877.054688 C 220.550781 877.054688 327.425781 840.457031 356.707031 737.738281 C 381.164062 651.941406 335.339844 558.257812 239.964844 499.070312 "/><path d="M 633.5625 728.367188 L 599.953125 728.367188 C 575.011719 728.367188 554.722656 708.074219 554.722656 683.136719 C 554.722656 658.457031 575.011719 638.382812 599.953125 638.382812 L 678.796875 638.382812 L 678.796875 683.621094 C 678.796875 708.292969 658.503906 728.367188 633.5625 728.367188 M 578.125 314.679688 L 496.914062 314.679688 C 486.257812 314.679688 477.621094 323.320312 477.621094 333.972656 L 477.621094 444.074219 C 477.621094 454.730469 486.257812 463.367188 496.914062 463.367188 L 578.121094 463.367188 C 604.171875 463.367188 627.867188 473.398438 645.765625 489.695312 L 599.953125 489.695312 C 494.054688 489.695312 407.710938 574.808594 406.058594 680.058594 C 404.355469 788.394531 495.496094 877.054688 603.84375 877.054688 L 633.5625 877.054688 C 740.492188 877.054688 827.484375 790.28125 827.484375 683.621094 L 827.484375 564.039062 C 827.484375 426.324219 715.839844 314.679688 578.125 314.679688 "/></symbol>
+  <symbol id="salvy-hand-symbol" viewBox="0 0 125.77 157.13"><path d="M24.06,129.69h12.77v6.38h-12.77v-6.38M24.06,129.69v-12.77h-6.38v12.77h6.38ZM36.83,110.53h6.38v-6.38h-6.38v6.38ZM43.21,104.15h25.58v-6.38h-25.58v6.38ZM17.67,97.72h-6.38v19.2h6.38v-19.2ZM24.06,91.33h-6.38v6.38h6.38v-6.38ZM68.79,97.72h6.38v-6.38h6.38v-6.38h-12.77v12.77ZM30.44,84.95h-6.38v6.38h6.38v-6.38ZM87.99,84.95v-25.58h-6.38v25.58h6.38ZM107.15,84.95v-25.58h-6.38v25.58h6.38ZM68.79,59.37h-6.38v19.2h-31.97v6.38h38.35v-25.58ZM24.06,65.79v12.77h6.38v-12.77h-6.38ZM100.76,129.69h-6.38v6.38h6.38M100.76,91.33v-6.38h-12.77v6.38h12.77ZM114.48,136.07,49.64,65.79v-6.38h-6.38v6.38h6.38ZM100.76,52.98h-12.77v6.38h12.77v-6.38ZM56.02,40.21h-6.38v19.2h6.38v-19.2ZM17.67,46.6v19.2h6.38v-19.2h-6.38ZM43.21,59.37v-12.77h-6.38v12.77h6.38ZM68.79,59.37h12.77v-6.38h-6.38v-12.77h-6.38v19.2-.04ZM62.41,21.01h-6.38v19.2h6.38v-19.2ZM81.61,40.21v-19.2h-6.38v19.2h6.38ZM36.83,46.6v-19.2h-6.38v19.2h6.38ZM11.29,27.4v19.2h6.38v-19.2h-6.38ZM75.18,14.63h-12.77v6.38h12.77v-6.38ZM30.44,21.01h-12.77v6.38h12.77v-6.38ZM68.79,142.5h25.58v-6.38h-25.58v6.38ZM49.64,142.5v-6.38h-12.77v6.38h12.77ZM107.15,129.73v-38.44s-6.38,0-6.38,0v38.44s6.38,0,6.38,0Z"/></symbol>
+</svg>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-logo">
+    <a href="https://salvy.com.br" target="_blank" rel="noopener" aria-label="Salvy">
+      <svg class="logo-svg" viewBox="0 0 2543.86 1366.6" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Salvy"><use href="#salvy-logo-symbol"/></svg>
+    </a>
+  </div>
+  <div class="hero-inner">
+    <span class="hero-tag"><svg class="wa-badge" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#25D366"/><path fill="#FFFFFF" d="M12.03 5.2c-3.77 0-6.83 3.06-6.84 6.83 0 1.2.32 2.38.92 3.42l-.98 3.58 3.66-.96c1 .55 2.14.84 3.29.84h.003c3.77 0 6.83-3.06 6.84-6.83a6.8 6.8 0 0 0-2-4.84 6.78 6.78 0 0 0-4.83-2.01zm4 9.77c-.17.48-.99.92-1.38.98-.35.05-.8.07-1.29-.08-.3-.09-.68-.22-1.17-.43-2.06-.89-3.4-2.96-3.51-3.1-.1-.13-.83-1.1-.83-2.1 0-1 .52-1.49.71-1.69.19-.2.41-.25.55-.25l.4.01c.13 0 .3-.05.47.36.17.42.59 1.45.64 1.55.05.1.09.22.02.36-.07.13-.1.22-.2.34l-.3.35c-.1.1-.2.2-.09.4.11.19.5.82 1.07 1.33.73.65 1.35.86 1.54.96.19.1.3.08.41-.05.11-.13.47-.55.6-.74.12-.19.25-.16.41-.1.17.06 1.09.51 1.28.61.19.09.31.14.36.22.05.08.05.48-.12.96z"/></svg> Guia gratuito para WhatsApp Business</span>
+    <h1 class="hero-title">Como automatizar o <span class="accent">atendimento</span> no WhatsApp Business</h1>
+    <p class="hero-desc">Do Meta Business Agent à API oficial da Meta. Reunimos tudo o que sua empresa precisa saber para gerar mais resultados no aplicativo usado por milhões de brasileiros.</p>
+    <div class="hero-cta-row">
+      <a href="#content" class="btn-primary" id="heroCtaBtn">
+        <span class="arrow-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        Ler o guia completo
+      </a>
+      <span class="hero-cta-note">Leitura de 10 minutos. Sem custo.</span>
+    </div>
+
+    <div class="hero-visual">
+      <div class="config-panel">
+        <div class="cp-bar">
+          <div class="cp-bar-ic"><svg class="wa-badge" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#25D366"/><path fill="#FFFFFF" d="M12.03 5.2c-3.77 0-6.83 3.06-6.84 6.83 0 1.2.32 2.38.92 3.42l-.98 3.58 3.66-.96c1 .55 2.14.84 3.29.84h.003c3.77 0 6.83-3.06 6.84-6.83a6.8 6.8 0 0 0-2-4.84 6.78 6.78 0 0 0-4.83-2.01zm4 9.77c-.17.48-.99.92-1.38.98-.35.05-.8.07-1.29-.08-.3-.09-.68-.22-1.17-.43-2.06-.89-3.4-2.96-3.51-3.1-.1-.13-.83-1.1-.83-2.1 0-1 .52-1.49.71-1.69.19-.2.41-.25.55-.25l.4.01c.13 0 .3-.05.47.36.17.42.59 1.45.64 1.55.05.1.09.22.02.36-.07.13-.1.22-.2.34l-.3.35c-.1.1-.2.2-.09.4.11.19.5.82 1.07 1.33.73.65 1.35.86 1.54.96.19.1.3.08.41-.05.11-.13.47-.55.6-.74.12-.19.25-.16.41-.1.17.06 1.09.51 1.28.61.19.09.31.14.36.22.05.08.05.48-.12.96z"/></svg></div>
+          <span>Configurações do Meta Business Agent</span>
+          <span class="cp-bar-tag">Conectado</span>
+        </div>
+        <div class="cp-body">
+          <div class="cp-col">
+            <div>
+              <div class="pm-field-label">Nome do negócio</div>
+              <div class="pm-field-value placeholder">Nome da sua empresa</div>
+            </div>
+            <div>
+              <div class="pm-field-label">Horário de atendimento</div>
+              <div class="pm-field-value">Seg a sáb · 09h às 19h</div>
+            </div>
+          </div>
+          <div class="cp-col">
+            <div class="pm-toggle-row">
+              <div>
+                <div class="pm-toggle-label">Responder automaticamente</div>
+                <div class="pm-toggle-sub">Fora do horário comercial</div>
+              </div>
+              <div class="pm-toggle on"></div>
+            </div>
+            <div class="pm-toggle-row">
+              <div>
+                <div class="pm-toggle-label">Usar base de conhecimento</div>
+                <div class="pm-toggle-sub">Catálogo, políticas e FAQ</div>
+              </div>
+              <div class="pm-toggle on"></div>
+            </div>
+            <div class="pm-toggle-row">
+              <div>
+                <div class="pm-toggle-label">Transferir pra um atendente</div>
+                <div class="pm-toggle-sub">Quando o cliente pedir</div>
+              </div>
+              <div class="pm-toggle on"></div>
+            </div>
+          </div>
+        </div>
+        <div class="cp-footer">
+          <div class="pm-save-status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Configuração salva automaticamente</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<div id="content">
+  <div id="content-inner">
+
+    <!-- WHY / CONTEXT -->
+    <section class="section">
+      <div class="wrap section-head center" style="max-width:760px;">
+        <span class="eyebrow">Por que agora</span>
+        <h2 class="h2 center">A agilidade no atendimento no WhatsApp Business define os resultados do seu negócio</h2>
+        <p class="lead center">No cenário atual, em que as interações digitais fazem parte da rotina, responder com agilidade deixou de ser um diferencial e se tornou uma expectativa básica dos consumidores. No final, quem demora para responder perde venda para quem responde na hora.</p>
+      </div>
+    </section>
+
+    <!-- STATS DARK -->
+    <section class="section alt">
+      <div class="wrap">
+        <div class="stat-band reveal">
+          <div><div class="stat-num">2<span class="accent">bi</span></div><div class="stat-cap">de pessoas usam o WhatsApp todo mês no mundo <span class="stat-source">(Fonte: Meta)</span></div></div>
+
+          <div><div class="stat-num">73<span class="accent">%</span></div><div class="stat-cap">dos clientes preferem mandar mensagem a fazer uma ligação <span class="stat-source">(Fonte: Meta)</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHAT IS BUSINESS AI -->
+    <section class="section alt">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Meta Business Agent</span>
+          <h2 class="h2">Como usar a IA da Meta para automatizar as respostas do WhatsApp Business</h2>
+          <p class="lead">Atender rápido não exige mais montar uma equipe disponível 24h. Com o Meta Business Agent, inteligência artificial que já vem integrada ao WhatsApp Business, você cadastra as informações da empresa e ele responde os clientes sozinho, a qualquer hora do dia.</p>
+        </div>
+
+        <div class="feature-row reveal">
+          <div class="fr-copy">
+            <div class="fr-kicker">O que ele resolve pra você</div>
+            <div class="fr-title">Atende sozinho, no seu tom de voz</div>
+            <p class="fr-text">Ele usa o mesmo modelo de linguagem da Meta, então entende o que o cliente quer mesmo quando a mensagem não está bem escrita. Nada de menu com "digite 1 para financeiro".</p>
+            <ul class="fr-list">
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Responde as dúvidas que mais chegam sobre produto e serviço</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Passa horário, endereço, catálogo e condições</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Faz a primeira triagem antes de passar pra alguém do time</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Passa a conversa pra um humano quando precisa</li>
+            </ul>
+          </div>
+          <div class="fr-visual">
+            <div style="width:100%; display:flex; flex-direction:column; gap:10px;">
+              <div class="bubble in" style="max-width:100%; box-shadow:none; border:1px solid #E6E6E6;"><span class="who"><svg class="wa-badge" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#25D366"/><path fill="#FFFFFF" d="M12.03 5.2c-3.77 0-6.83 3.06-6.84 6.83 0 1.2.32 2.38.92 3.42l-.98 3.58 3.66-.96c1 .55 2.14.84 3.29.84h.003c3.77 0 6.83-3.06 6.84-6.83a6.8 6.8 0 0 0-2-4.84 6.78 6.78 0 0 0-4.83-2.01zm4 9.77c-.17.48-.99.92-1.38.98-.35.05-.8.07-1.29-.08-.3-.09-.68-.22-1.17-.43-2.06-.89-3.4-2.96-3.51-3.1-.1-.13-.83-1.1-.83-2.1 0-1 .52-1.49.71-1.69.19-.2.41-.25.55-.25l.4.01c.13 0 .3-.05.47.36.17.42.59 1.45.64 1.55.05.1.09.22.02.36-.07.13-.1.22-.2.34l-.3.35c-.1.1-.2.2-.09.4.11.19.5.82 1.07 1.33.73.65 1.35.86 1.54.96.19.1.3.08.41-.05.11-.13.47-.55.6-.74.12-.19.25-.16.41-.1.17.06 1.09.51 1.28.61.19.09.31.14.36.22.05.08.05.48-.12.96z"/></svg> Sua IA</span>Temos entrega pra todo o Brasil! Pra São Paulo o prazo é de 2 dias úteis. Quer que eu já veja o frete pro seu CEP?</div>
+              <div class="bubble out" style="max-width:70%; align-self:flex-end;">Quero sim!</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout warn"><strong>Onde ele para:</strong> o Meta Business Agent não conversa com sistemas de fora, como o seu CRM ou o sistema de pedidos, e não consulta dados em tempo real. Para isso, é necessária a API oficial, que a gente explica mais adiante. Se o recurso ainda não apareceu no seu app, é a Meta liberando aos poucos.</div>
+      </div>
+    </section>
+
+    <!-- HOW TO SET UP (timeline) -->
+    <section class="section">
+      <div class="wrap">
+        <div style="max-width:720px; margin:0 auto;">
+        <div class="section-head reveal">
+          <span class="eyebrow">Mão na massa</span>
+          <h2 class="h2">Como ativar seu agente em poucos passos</h2>
+          <p class="lead">A ordem importa. Pular uma etapa costuma ser o motivo de a IA responder de forma genérica ou passar informação errada pro cliente.</p>
+        </div>
+
+        <div class="steps reveal-group">
+          <div class="step reveal-item"><div class="step-num">1</div><div class="step-body"><h3>Atualize o app e abra o Meta Business Agent</h3><p>Vá em Ferramentas de negócios e procure o Meta Business Agent. Se ele não aparecer, o recurso ainda não chegou pro seu número, a Meta está liberando por etapas.</p><span class="step-tip"><svg class="wa-badge" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#25D366"/><path fill="#FFFFFF" d="M12.03 5.2c-3.77 0-6.83 3.06-6.84 6.83 0 1.2.32 2.38.92 3.42l-.98 3.58 3.66-.96c1 .55 2.14.84 3.29.84h.003c3.77 0 6.83-3.06 6.84-6.83a6.8 6.8 0 0 0-2-4.84 6.78 6.78 0 0 0-4.83-2.01zm4 9.77c-.17.48-.99.92-1.38.98-.35.05-.8.07-1.29-.08-.3-.09-.68-.22-1.17-.43-2.06-.89-3.4-2.96-3.51-3.1-.1-.13-.83-1.1-.83-2.1 0-1 .52-1.49.71-1.69.19-.2.41-.25.55-.25l.4.01c.13 0 .3-.05.47.36.17.42.59 1.45.64 1.55.05.1.09.22.02.36-.07.13-.1.22-.2.34l-.3.35c-.1.1-.2.2-.09.4.11.19.5.82 1.07 1.33.73.65 1.35.86 1.54.96.19.1.3.08.41-.05.11-.13.47-.55.6-.74.12-.19.25-.16.41-.1.17.06 1.09.51 1.28.61.19.09.31.14.36.22.05.08.05.48-.12.96z"/></svg> Só funciona no WhatsApp Business</span></div></div>
+          <div class="step reveal-item"><div class="step-num">2</div><div class="step-body"><h3>Ative e leia os termos com calma</h3><p>Antes de aceitar, vale a pena ler os termos. Eles explicam como a Meta usa as conversas para treinar essa IA.</p><span class="step-tip">Chame o jurídico se você lida com dado sensível</span></div></div>
+          <div class="step reveal-item"><div class="step-num">3</div><div class="step-body"><h3>Cadastre as informações do negócio</h3><p>Descrição, horário, endereço, catálogo e links. Escreva como se estivesse explicando o negócio para alguém que começou hoje na empresa.</p></div></div>
+          <div class="step reveal-item"><div class="step-num">4</div><div class="step-body"><h3>Escolha quem a IA vai atender</h3><p>Pode ser todo mundo, só quem entra em contato pela primeira vez, ou um horário fixo do dia.</p><span class="step-tip">Recomendamos começar só pelos contatos novos</span></div></div>
+          <div class="step reveal-item"><div class="step-num">5</div><div class="step-body"><h3>Alimente a base de conhecimento</h3><p>Suba PDFs, manuais e políticas. Comece pelos documentos que respondem as perguntas mais comuns do seu atendimento.</p><span class="step-tip">Documento desatualizado costuma virar resposta errada</span></div></div>
+          <div class="step reveal-item"><div class="step-num">6</div><div class="step-body"><h3>Dê exemplos de pergunta e resposta</h3><p>Monte pares de pergunta e a resposta ideal. Inclua também reclamação, objeção de preço e o pedido de falar com uma pessoa.</p><span class="step-tip">Liste as 30 dúvidas mais comuns e transforme em exemplo</span></div></div>
+          <div class="step reveal-item"><div class="step-num">7</div><div class="step-body"><h3>Teste antes de soltar pro público</h3><p>Use o "Testar sua IA" e converse com ela como se fosse cliente. Só ative de verdade quando gostar do padrão das respostas.</p><span class="step-tip">Quando um atendente assume a conversa, a IA pausa sozinha</span></div></div>
+          <div class="step reveal-item"><div class="step-num">8</div><div class="step-body"><h3>Se precisar pausar a IA, é fácil</h3><p>Vá em Ferramentas, em seguida toque em Meta Business Agent, entre em Respostas da IA e selecione a opção "Pausado para novas conversas, mas aprendendo". Nesse modo, a IA deixa de responder às novas conversas, mas continua aprendendo para aprimorar seu desempenho. A qualquer momento, o agente pode ser reativado.</p></div></div>
+        </div>
+        </div>
+
+        <div class="salvy-banner reveal">
+          <div class="sb-copy">
+            <svg class="sb-mark" viewBox="0 0 125.77 157.13" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><use href="#salvy-hand-symbol"/></svg>
+            <div class="sb-text">
+              <h4>Para começar, é necessário ter um número dedicado</h4>
+              <p>Conheça os planos de WhatsApp Business Ilimitado da Salvy.</p>
+            </div>
+          </div>
+          <a href="#numero-whatsapp" class="sb-btn">
+            Ver planos
+            <span class="arrow-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRAINING -->
+    <section class="section alt">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Treino da IA</span>
+          <h2 class="h2">O treinamento da IA é a chave para usar o recurso da melhor forma</h2>
+          <p class="lead">Configurar leva minutos. O que realmente faz diferença é montar uma base de conhecimento que represente bem a sua empresa.</p>
+        </div>
+
+        <p class="body">Pense na base de conhecimento como o material de treinamento de um atendente novo: tudo que ele precisaria saber para se virar bem nos primeiros dias.</p>
+
+        <div class="duo reveal">
+          <div class="duo-card pos">
+            <h4><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Vale colocar</h4>
+            <ul>
+              <li>Descrição dos produtos com preço e condição</li>
+              <li>Política de troca, cancelamento e garantia</li>
+              <li>Horário, endereço e formas de contato</li>
+              <li>Casos que o atendimento resolve toda semana</li>
+              <li>O jeito da marca falar com o cliente</li>
+            </ul>
+          </div>
+          <div class="duo-card neg">
+            <h4><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></span> Melhor deixar de fora</h4>
+            <ul>
+              <li>Documento desatualizado ou que se contradiz</li>
+              <li>Texto vago que não ajuda na prática</li>
+              <li>Conteúdo extenso, sem título e sem estrutura</li>
+              <li>Dado sensível de cliente</li>
+              <li>Informação confidencial da empresa</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout"><strong>Para acertar o tom de voz:</strong> escreva de 3 a 5 exemplos de como a sua marca responderia perguntas comuns. Diga se é mais formal ou informal, se usa emoji, se chama a pessoa de "você" e qual o tamanho ideal de uma resposta.</div>
+
+        <div style="margin-top:36px;">
+          <h3 style="font-family:'Poppins',sans-serif; font-size:19px; font-weight:500; color:#3d3d3d; letter-spacing:-0.03em; margin-bottom:8px;">Um template de FAQ pra você adaptar</h3>
+          <p class="body" style="margin-bottom:16px;">Preencha com as respostas da sua empresa e suba direto na base de conhecimento.</p>
+          <div class="template reveal">
+            <div class="template-label">Base de FAQ</div>
+            <div class="trow"><div class="tq">Qual o horário de atendimento?</div><div class="ta">coloque os seus horários</div></div>
+            <div class="trow"><div class="tq">Como cancelo meu pedido?</div><div class="ta">explique o passo a passo</div></div>
+            <div class="trow"><div class="tq">Qual o prazo de entrega?</div><div class="ta">informe por região ou produto</div></div>
+            <div class="trow"><div class="tq">Como falo com uma pessoa?</div><div class="ta">diga como pedir a transferência</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EVOLUTION -->
+    <section class="section">
+      <div class="wrap">
+        <div style="max-width:720px; margin:0 auto;">
+        <div class="section-head reveal">
+          <span class="eyebrow">Próximo nível</span>
+          <h2 class="h2">Quando vale a pena migrar para a API oficial</h2>
+          <p class="lead">O Meta Business Agent é ótimo para começar. Mas conforme a operação cresce, ele passa a mostrar limitações, e vale entender com antecedência quando compensa evoluir.</p>
+        </div>
+
+        <div class="evo reveal-group">
+          <div class="evo-card reveal-item"><div class="evo-badge">1</div><div><h4>WhatsApp Business + Meta Business Agent</h4><p>Atendimento automático no básico. Roda no celular, sem integração com outros sistemas. É por aqui que a maioria começa.</p></div></div>
+          <div class="evo-card active reveal-item"><div class="evo-badge">2</div><div><h4>API oficial da Meta</h4><p>Vários atendentes no mesmo número, integração com CRM e ERP, e uma IA mais robusta. Sem depender de um celular ligado o tempo todo.</p></div><span class="evo-tag">Onde a maioria evolui</span></div>
+        </div>
+
+        <div class="duo reveal" style="grid-template-columns:1fr;">
+          <div class="duo-card pos">
+            <h4><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Sinais de que chegou a hora</h4>
+            <ul>
+              <li>O time precisa dividir o mesmo número</li>
+              <li>Você quer integrar o WhatsApp ao CRM ou ERP</li>
+              <li>O volume de mensagens já sufoca a operação</li>
+              <li>É preciso mais controle, relatório ou governança</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout"><strong>Sobre o custo:</strong> a API cobra por conversa, em janelas de 24 horas. Para uma operação grande, costuma sair mais barato do que manter uma equipe inteira dedicada ao atendimento.</div>
+        </div>
+
+        <div class="salvy-banner reveal">
+          <div class="sb-copy">
+            <svg class="sb-mark" viewBox="0 0 125.77 157.13" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><use href="#salvy-hand-symbol"/></svg>
+            <div class="sb-text">
+              <h4>Vai migrar para a API oficial?</h4>
+              <p>Com a Salvy você ativa um número virtual em instantes.</p>
+            </div>
+          </div>
+          <a href="https://salvy.com.br/numerovirtualmovel" class="sb-btn" target="_blank" rel="noopener">
+            Começar agora
+            <span class="arrow-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHOOSING NUMBER -->
+    <section class="section alt" id="numero-whatsapp">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow"><svg class="hand" viewBox="0 0 125.77 157.13" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><use href="#salvy-hand-symbol"/></svg> A linha certa</span>
+          <h2 class="h2">Qual a melhor forma de ter um número para o Meta Business Agent ou para a API oficial da Meta?</h2>
+          <p class="lead">Muita empresa só percebe tarde que número pessoal e número corporativo são coisas bem diferentes, principalmente quando a operação cresce.</p>
+        </div>
+
+        <div class="callout warn"><strong>O risco de usar número pessoal:</strong> se a pessoa sai da empresa, o número vai junto. Não é possível ter vários atendentes sem gambiarra, a empresa não tem controle sobre a linha, e se o WhatsApp banir o número, não há a quem recorrer.</div>
+
+        <div class="feature-row reveal" style="margin-top:16px;">
+          <div class="fr-copy">
+            <div class="fr-kicker">É aqui que a Salvy entra</div>
+            <div class="fr-title">Todas as linhas da empresa num lugar só</div>
+            <p class="fr-text">A linha fica no CNPJ da empresa, não no celular de um funcionário. O time de TI enxerga tudo em um só painel, e qualquer linha pode ser transferida, desativada ou trocada de dono sem depender de ninguém.</p>
+            <ul class="fr-list">
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Chip, eSIM ou número virtual pra API</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Ativa e cancela em minutos, sem fidelidade</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Painel único pra controlar tudo</li>
+            </ul>
+          </div>
+          <div class="fr-visual" style="background:var(--gray-1); padding:20px;">
+            <div class="panel-mock">
+              <div class="pm-head">
+                <span class="pm-title"><span class="dot"></span> Linhas da empresa</span>
+                <span class="pm-badge">3 ativas</span>
+              </div>
+              <div class="pm-row">
+                <div class="pm-line">
+                  <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></span>
+                  <div><div class="pm-num">+55 11 98220-4471</div><div class="pm-sub">Chip · Comercial</div></div>
+                </div>
+                <span class="pm-status">Ativa</span>
+              </div>
+              <div class="pm-row">
+                <div class="pm-line">
+                  <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></span>
+                  <div><div class="pm-num">+55 11 97310-2298</div><div class="pm-sub">eSIM · Suporte</div></div>
+                </div>
+                <span class="pm-status">Ativa</span>
+              </div>
+              <div class="pm-row">
+                <div class="pm-line">
+                  <span class="pm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span>
+                  <div><div class="pm-num">+55 11 4002-8922</div><div class="pm-sub">Número virtual · API oficial</div></div>
+                </div>
+                <span class="pm-status">Ativa</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:40px;">
+          <h3 style="font-family:'Poppins',sans-serif; font-size:19px; font-weight:500; color:#3d3d3d; letter-spacing:-0.03em; margin-bottom:8px;">Qual plano da Salvy é ideal para a empresa?</h3>
+          <p class="body" style="margin-bottom:8px;">Siga o fluxo abaixo pra descobrir rapidinho qual formato de linha combina com o seu jeito de usar o WhatsApp.</p>
+
+          <div class="flow-diagram reveal-group">
+            <svg viewBox="0 0 880 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fluxograma para escolher o plano ideal da Salvy">
+              <defs>
+                <marker id="flowArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" fill="var(--muted-2)"/>
+                </marker>
+              </defs>
+
+              <!-- conectores ortogonais -->
+              <path class="flow-line" pathLength="100" marker-end="url(#flowArrow)" d="M440,104 L440,146 L300,146 L300,210" style="transition-delay:.5s"/>
+              <path class="flow-line" pathLength="100" marker-end="url(#flowArrow)" d="M440,104 L440,146 L730,146 L730,210" style="transition-delay:.6s"/>
+              <path class="flow-line" pathLength="100" marker-end="url(#flowArrow)" d="M300,300 L300,345 L155,345 L155,400" style="transition-delay:1.0s"/>
+              <path class="flow-line" pathLength="100" marker-end="url(#flowArrow)" d="M300,300 L300,345 L440,345 L440,400" style="transition-delay:1.1s"/>
+
+              <!-- etiquetas das ramificações -->
+              <g>
+                <rect class="flow-tag-bg" x="265" y="134" width="100" height="24" rx="12" fill="var(--white)" stroke="var(--gray-3)" style="transition-delay:.5s"/>
+                <text class="flow-tag-text" x="315" y="150" text-anchor="middle" style="transition-delay:.5s">Pequena</text>
+              </g>
+              <g>
+                <rect class="flow-tag-bg" x="680" y="134" width="100" height="24" rx="12" fill="var(--white)" stroke="var(--gray-3)" style="transition-delay:.6s"/>
+                <text class="flow-tag-text" x="730" y="150" text-anchor="middle" style="transition-delay:.6s">Grande</text>
+              </g>
+              <g>
+                <rect class="flow-tag-bg" x="125" y="333" width="60" height="24" rx="12" fill="var(--white)" stroke="var(--gray-3)" style="transition-delay:1.0s"/>
+                <text class="flow-tag-text" x="155" y="349" text-anchor="middle" style="transition-delay:1.0s">Sim</text>
+              </g>
+              <g>
+                <rect class="flow-tag-bg" x="410" y="333" width="60" height="24" rx="12" fill="var(--white)" stroke="var(--gray-3)" style="transition-delay:1.1s"/>
+                <text class="flow-tag-text" x="440" y="349" text-anchor="middle" style="transition-delay:1.1s">Não</text>
+              </g>
+
+              <!-- nó 1: decisão inicial -->
+              <g class="flow-node" style="transition-delay:0s;">
+                <rect class="flow-decision" x="230" y="20" width="420" height="84" rx="18"/>
+                <text class="flow-eyebrow" x="440" y="40" text-anchor="middle">Comece aqui</text>
+                <text class="flow-title" x="440" y="64" text-anchor="middle">Qual o tamanho da operação?</text>
+                <text class="flow-sub" x="440" y="86" text-anchor="middle">Time e volume de linhas</text>
+              </g>
+
+              <!-- nó 2: decisão (operação pequena) -->
+              <g class="flow-node" style="transition-delay:.7s;">
+                <rect class="flow-decision" x="110" y="210" width="380" height="90" rx="18"/>
+                <text class="flow-eyebrow" x="300" y="234" text-anchor="middle">Em seguida</text>
+                <text class="flow-title" x="300" y="264" text-anchor="middle">Vocês usam chip físico?</text>
+              </g>
+
+              <!-- recomendação direta (operação grande) -->
+              <g class="flow-node" style="transition-delay:.75s;">
+                <rect class="flow-result" x="600" y="210" width="260" height="150" rx="18"/>
+                <text class="flow-eyebrow result" x="624" y="236" text-anchor="start">Recomendação direta</text>
+                <text class="flow-title" x="624" y="264" text-anchor="start">API Oficial + Número</text>
+                <text class="flow-title" x="624" y="286" text-anchor="start">Virtual</text>
+                <text class="flow-sub" x="624" y="312" text-anchor="start">Ativação em instantes, sem</text>
+                <text class="flow-sub" x="624" y="332" text-anchor="start">depender de celular ou chip.</text>
+              </g>
+
+              <!-- resultado: chip físico -->
+              <g class="flow-node" style="transition-delay:1.2s;">
+                <rect class="flow-result" x="30" y="400" width="250" height="120" rx="18"/>
+                <text class="flow-eyebrow result" x="54" y="426">Resultado</text>
+                <text class="flow-title" x="54" y="448">Plano Whats Ilimitado —</text>
+                <text class="flow-title" x="54" y="470">Chip Físico</text>
+                <text class="flow-sub" x="54" y="492">Envio grátis para qualquer</text>
+                <text class="flow-sub" x="54" y="510">lugar do Brasil.</text>
+              </g>
+
+              <!-- resultado: eSIM -->
+              <g class="flow-node" style="transition-delay:1.3s;">
+                <rect class="flow-result" x="315" y="400" width="250" height="120" rx="18"/>
+                <text class="flow-eyebrow result" x="339" y="426">Resultado</text>
+                <text class="flow-title" x="339" y="448">Plano Whats Ilimitado —</text>
+                <text class="flow-title" x="339" y="470">eSIM</text>
+                <text class="flow-sub" x="339" y="494">Ativação na hora.</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="salvy-banner reveal" style="margin-top:32px;">
+          <div class="sb-copy">
+            <svg class="sb-mark" viewBox="0 0 125.77 157.13" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><use href="#salvy-hand-symbol"/></svg>
+            <div class="sb-text">
+              <h4>Ative em instantes uma nova linha</h4>
+              <p>Pra WhatsApp Business, no CNPJ da empresa e sem burocracia.</p>
+            </div>
+          </div>
+          <a href="https://salvy.com.br/" class="sb-btn" target="_blank" rel="noopener">
+            Começar agora
+            <span class="arrow-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACCOUNT SAFETY -->
+    <section class="section alt">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <span class="eyebrow">Dica bônus</span>
+          <h2 class="h2">Como evitar bloqueio do número do WhatsApp Business</h2>
+          <p class="lead">A própria Meta monitora contas que violam as políticas repetidamente. As restrições começam com avisos, mas podem virar bloqueio de envio e, no limite, desativação permanente. Nada disso é raro — e é bem evitável.</p>
+        </div>
+
+        <div class="duo reveal">
+          <div class="duo-card pos">
+            <h4><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Faça isso</h4>
+            <ul>
+              <li>Só fale com quem já deu o número e topou receber mensagem da empresa</li>
+              <li>Deixe claro o nome da empresa logo no início da conversa</li>
+              <li>Separe categorias de mensagem (pedido, cobrança, oferta) e deixe fácil descadastrar de cada uma</li>
+              <li>Responda rápido e resolva de verdade — isso é o que sustenta a classificação de qualidade</li>
+              <li>Acompanhe os avisos de violação na Central de Notificações do Gerenciador de Negócios</li>
+            </ul>
+          </div>
+          <div class="duo-card neg">
+            <h4><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></span> Evite isso</h4>
+            <ul>
+              <li>Mandar mensagem pra lista comprada ou pra quem nunca deu esse contato</li>
+              <li>Ignorar pedidos de descadastro ou de parar de receber uma categoria</li>
+              <li>Deixar a taxa de bloqueio e denúncia subir sem ajustar a operação</li>
+              <li>Insistir num padrão de mensagem sinalizado, mesmo depois do primeiro aviso</li>
+              <li>Automação não oficial ou apps de terceiros pra burlar limite de envio</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout"><strong>Como funciona a régua de punição:</strong> a Meta primeiro avisa qual política foi violada. Se persistir, aplica bloqueios de envio que aumentam em duração — de 1 dia até indefinido, revertido só por apelação. Em casos graves (conteúdo proibido, golpe, exploração infantil) a conta pode ser desativada na hora, sem aviso prévio. <a href="https://developers.facebook.com/documentation/business-messaging/whatsapp/policy-enforcement" target="_blank" rel="noopener" style="color:var(--ink-2); text-decoration:underline;">Fonte: documentação oficial da Meta</a>.</div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section">
+      <div class="wrap">
+        <div style="max-width:720px;margin:0 auto;">
+        <div class="section-head center reveal">
+          <span class="eyebrow">Perguntas rápidas</span>
+          <h2 class="h2 center">Ainda ficou com dúvida?</h2>
+        </div>
+        <div class="faq reveal-group">
+          <details class="faq-item reveal-item"><summary>O Meta Business Agent é gratuito?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary><div class="faq-a">Por enquanto a Meta oferece o recurso sem custo extra para empresas que já usam o WhatsApp Business e são elegíveis. A tendência é isso mudar conforme o produto evolui.</div></details>
+          <details class="faq-item reveal-item"><summary>Qual a diferença entre o Meta Business Agent e a API oficial?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary><div class="faq-a">O Meta Business Agent vive dentro do app, funciona sem programação e sem integração. A API oficial exige mais estrutura, mas abre espaço para automação avançada e integração com qualquer sistema que a empresa já usa.</div></details>
+          <details class="faq-item reveal-item"><summary>Preciso de programador pra usar o Meta Business Agent?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary><div class="faq-a">Não. O Meta Business Agent foi feito para configurar direto no app, sem escrever uma linha de código. Já para a API oficial, sim: é necessário um desenvolvedor ou uma plataforma que cuide da parte técnica.</div></details>
+          <details class="faq-item reveal-item"><summary>A Salvy dá suporte ao WhatsApp ou à Meta?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary><div class="faq-a">Não. A Salvy cuida da parte de telefonia: chip, eSIM e número virtual. Suporte sobre recursos, aprovação ou políticas das plataformas da Meta não faz parte do nosso escopo.</div></details>
+        </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /content-inner -->
+</div><!-- /content -->
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="fc-glow"></div>
+  <div class="fc-inner reveal">
+    <span class="fc-eyebrow"><span class="dot"></span> Salvy</span>
+    <h2 class="fc-title">Sua linha <span class="accent">corporativa</span> pronta em minutos</h2>
+    <p class="fc-desc">Para rodar o Meta Business Agent ou a API oficial da Meta, você precisa de uma linha no CNPJ da empresa. Com a Salvy, você ativa chip, eSIM ou número virtual e tem controle completo sobre linhas, planos e consumo.</p>
+
+    <div class="fc-opts">
+      <div class="fc-opt">
+        <div class="fc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
+        <h4>Chip ou eSIM</h4>
+        <p>Pro Meta Business Agent no WhatsApp.</p>
+      </div>
+      <div class="fc-opt">
+        <div class="fc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        <h4>Número virtual</h4>
+        <p>Pra API oficial da Meta.</p>
+      </div>
+      <div class="fc-opt">
+        <div class="fc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg></div>
+        <h4>Gestão centralizada</h4>
+        <p>Controle total pro time de TI.</p>
+      </div>
+    </div>
+
+    <a href="https://app.salvy.com.br/sign-up" class="fc-btn" target="_blank" rel="noopener">
+      Começar na Salvy
+      <span class="arrow-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <a href="https://salvy.com.br" target="_blank" rel="noopener" aria-label="Salvy">
+      <svg class="logo-svg" viewBox="0 0 2543.86 1366.6" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Salvy"><use href="#salvy-logo-symbol"/></svg>
+    </a>
+    <p class="site-footer-copy">© 2026 Salvy · Telefonia corporativa sem burocracia e sem fidelidade</p>
+    <div class="site-footer-links">
+      <a href="https://salvy.com.br" target="_blank" rel="noopener">salvy.com.br</a>
+      <a href="https://app.salvy.com.br/sign-up" target="_blank" rel="noopener">Criar conta</a>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+  // Botão "Ler o guia completo": rola até o conteúdo. Funciona tanto se o
+  // iframe tiver scroll próprio (rolagem normal) quanto se for "altura automática"
+  // sem scroll interno (aí avisa a página de fora, via postMessage, pra ela rolar)
+  var heroCtaBtn = document.getElementById('heroCtaBtn');
+  if (heroCtaBtn) {
+    heroCtaBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var target = document.getElementById('content');
+      if (!target) return;
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      try {
+        window.parent.postMessage({
+          type: 'salvyScrollTo',
+          offset: target.getBoundingClientRect().top + window.pageYOffset
+        }, '*');
+      } catch (e) {}
+    });
+  }
+
+  // Captura os parâmetros de UTM da URL e guarda nos campos ocultos do formulário
+  (function () {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+      utmKeys.forEach(function (key) {
+        var field = document.getElementById('gf-' + key.replace('utm_', 'utm-'));
+        if (field && params.get(key)) {
+          field.value = params.get(key);
+        }
+      });
+    } catch (e) {}
+  })();
+
+  // Propaga a mesma UTM pros links dos banners e do CTA final que apontam pro
+  // site/app da Salvy — sem isso, quem clica sai da página e perde a origem
+  // da campanha (o link ficava sempre "limpo", sem a UTM da visita).
+  (function () {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+      var utmPairs = [];
+      utmKeys.forEach(function (key) {
+        var val = params.get(key);
+        if (val) utmPairs.push([key, val]);
+      });
+      if (utmPairs.length === 0) return;
+
+      var links = document.querySelectorAll('a[href^="https://salvy.com.br"], a[href^="https://app.salvy.com.br"]');
+      links.forEach(function (link) {
+        try {
+          var url = new URL(link.getAttribute('href'), window.location.href);
+          utmPairs.forEach(function (pair) {
+            if (!url.searchParams.has(pair[0])) url.searchParams.set(pair[0], pair[1]);
+          });
+          link.setAttribute('href', url.toString());
+        } catch (e) {}
+      });
+    } catch (e) {}
+  })();
+
+</script>
+
+<script>
+  // ── scroll motion ──
+  (function () {
+    function setup() {
+      var targets = document.querySelectorAll('.reveal, .reveal-group');
+      if (!('IntersectionObserver' in window) || !targets.length) {
+        targets.forEach(function (t) { t.classList.add('in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      targets.forEach(function (t) { io.observe(t); });
+    }
+    if (document.readyState === 'complete' || document.readyState === 'interactive') setup();
+    else document.addEventListener('DOMContentLoaded', setup);
+  })();
+</script>
+
+</body>
+</html>
